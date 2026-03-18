@@ -98,8 +98,10 @@ describe Warbler::Jar, "with Bundler" do
       it "does not work with absolute :path" do
         @gem_dir = generate_gem('tester', Dir.mktmpdir("gems-#{Time.now.to_i}"))
         File.open("Gemfile", "w") {|f| f << "source 'file://#{@gem_dir}'\ngem 'tester', :path => '#{@gem_dir}'\n"}
-        bundle_install '--local'
-        silence { jar.apply(config) }
+        silence_all do
+          bundle_install '--local'
+          jar.apply(config)
+        end
         expect(file_list(%r{tester})).to be_empty
       end
 

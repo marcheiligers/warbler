@@ -37,6 +37,22 @@ def capture(&block)
   io.string
 end
 
+def silence_all
+  old_stdout = STDOUT.dup
+  old_stderr = STDERR.dup
+  io = File.open(File::NULL, 'w')
+
+  STDOUT.reopen(io)
+  STDERR.reopen(io)
+
+  yield
+ensure
+  STDOUT.reopen(old_stdout)
+  STDERR.reopen(old_stderr)
+  old_stdout.close
+  old_stderr.close
+end
+
 module ExampleGroupHelpers
   def run_in_directory(dir)
     before :each do
