@@ -233,7 +233,12 @@ describe Warbler::Jar, "with Bundler" do
           '--enable-native-access=ALL-UNNAMED --sun-misc-unsafe-memory-access=allow -XX:+IgnoreUnrecognizedVMOptions ' \
           '-jar foo.war -S rake test_task'
         )
-        expect(stderr.readlines.join).to eq("")
+
+        # JRuby 10 produces warnings with Bundler < 4, but JRuby 9.4 doesn't support Bundler >= 4
+        errors = stderr.readlines.reject do |line|
+                   line.include?('warning: already initialized constant')
+                 end
+        expect(errors.join).to eq("")
         expect(wait_thr.value.success?).to be(true)
         expect(stdout.readlines.join).to eq("success\n")
       end
